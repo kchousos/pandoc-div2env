@@ -15,7 +15,7 @@ def div2env(elem, doc, debug=False):
 
         # Convert the positional arguments to the proper \LaTeX format
         args = attr.get("data-environment-args", "").split(",")
-        args = "{{{0}}}".format("}{".join(args)) if args[0] else ""
+        args = "{{{0}}}".format("}{".join(args)) + "{}" if args[0] else "{}{}"
 
         # Enclose the keyword arguments in '[...]'
         opt = attr.get("data-environment-keyword", "")
