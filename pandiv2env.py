@@ -14,7 +14,7 @@ def div2env(elem, doc, debug=False):
             return
 
         # Convert the positional arguments to the proper \LaTeX format
-        args = attr.get("data-environment-args", "").split(",")
+        args = attr.get("data-environment-args", "").split("|")
         args = "{{{0}}}".format("}{".join(args)) + "{}" if args[0] else "{}{}"
 
         # Enclose the keyword arguments in '[...]'
@@ -33,15 +33,15 @@ def div2env(elem, doc, debug=False):
             panflute.debug("begin = '{0!s}'".format(begin))
             panflute.debug("end = '{0!s}'".format(end))
 
-        if not getattr(elem.content[0], "content", False):
-            begin = panflute.RawBlock(begin.text, format="latex")
-            end = panflute.RawBlock(end.text, format="latex")
-            elem = panflute.Div(begin, *elem.content, end)
+        # Check if the first content item is a list
+        if isinstance(elem.content[0], panflute.ListItem):
+            # Directly prepend and append the begin and end environments to the list
+            elem.content[0].content.insert(0, begin)
+            elem.content[0].content.append(end)
         else:
-            elem.content[0] = panflute.Para(begin,
-                                            *elem.content[0].content)
-            elem.content[-1] = panflute.Para(*elem.content[-1].content,
-                                             end)
+            # For non-list items, wrap them in Para elements as before
+            elem.content.insert(0, panflute.Para(begin))
+            elem.content.append(panflute.Para(end))
 
         if debug:
             panflute.debug("content = '{0!s}'".format(elem.content))
@@ -55,4 +55,3 @@ def main(doc=None):
 
 if __name__ == "__main__":
     main()
-
