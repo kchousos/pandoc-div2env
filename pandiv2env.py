@@ -2,6 +2,10 @@
 
 import panflute
 
+def process_image(elem):
+    # TODO
+    return elem
+
 def div2env(elem, doc, debug=False):
     if type(elem) == panflute.Div and doc.format in ["latex", "beamer"]:
         attr = getattr(elem, "attributes", None)
@@ -42,6 +46,14 @@ def div2env(elem, doc, debug=False):
             # For non-list items, wrap them in Para elements as before
             elem.content.insert(0, panflute.Para(begin))
             elem.content.append(panflute.Para(end))
+
+        # Process all contents to look for images and apply processing
+        for block in elem.content:
+            if isinstance(block, panflute.Para):
+                for idx, inline in enumerate(block.content):
+                    if isinstance(inline, panflute.Image):
+                        # Apply any generic processing to images
+                        block.content[idx] = process_image(inline)
 
         if debug:
             panflute.debug("content = '{0!s}'".format(elem.content))
